@@ -1,4 +1,6 @@
 import java.io.IOException;
+import java.util.LinkedList;
+import java.util.Queue;
 
 public class A1main {
 	public static PolarCoordinate starting;
@@ -55,6 +57,17 @@ public class A1main {
                 goal = new PolarCoordinate(d_g, angle_g);
 
                 //TODO
+                DFS dfs = new DFS(numOfParallels);
+                Queue<PolarCoordinate> path = new LinkedList<PolarCoordinate>();
+                boolean[][] visited = new boolean[numOfParallels - 1][8];
+                dfs.dfs(starting, path, visited);
+                while (!path.isEmpty()) {
+                	PolarCoordinate p = path.poll();
+                	String pathStr = p.getPath();
+                	if (!pathStr.equals("")) {
+                		System.out.println(pathStr);
+                	}
+                }
             } catch (NumberFormatException e) {
             	e.printStackTrace();
             } catch (IOException e) {
