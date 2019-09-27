@@ -1,18 +1,14 @@
 import java.util.ArrayList;
 
-public class DFS extends Search {
+
+public class BestFirstSearch extends Search {
 	private ArrayList<PolarCoordinate> frontier;
 
-	DFS(int numOfParallels) {
+	BestFirstSearch(int numOfParallels) {
 		super(numOfParallels);
 		frontier = new ArrayList<PolarCoordinate>();
 	}
 
-	/**
-	 * Run DFS.
-	 * @param starting - starting node
-	 * @return If success, returns the number of nodes that dfs passed through. Otherwise, returns -1.
-	 */
 	public int search(PolarCoordinate starting) {
 		int angle = starting.getAngle();
 		int distance = starting.getDistance();
@@ -40,7 +36,7 @@ public class DFS extends Search {
 			return 1;
 
 		} else {
-			ArrayList<PolarCoordinate> list = starting.getListOfNextCoordinates(numOfParallels);
+			ArrayList<PolarCoordinate> list = starting.getSortedListOfNextCoordinates(numOfParallels, starting);
 			int size = list.size();
 			int numOfPaths = -1;
 
@@ -67,6 +63,19 @@ public class DFS extends Search {
 	}
 
 	/**
+	 * Print out all coordinates in the frontier.
+	 */
+	private void printOutFrontier() {
+		System.out.println("Number of moves : " + (frontier.size() - 1));
+		System.out.print("Frontier : ");
+		for (PolarCoordinate node : frontier) {
+			System.out.print("(" + node.getDistance() + "," + node.getAngle() + ")");
+			System.out.print(" ");
+		}
+		System.out.println();
+	}
+
+	/**
 	 * Print out paths that are stored in the frontier.
 	 */
 	public void printOutPathsFromFrontier() {
@@ -84,18 +93,5 @@ public class DFS extends Search {
 				}
 			}
 		}
-	}
-
-	/**
-	 * Print out all coordinates in the frontier.
-	 */
-	private void printOutFrontier() {
-		System.out.println("Number of moves : " + (frontier.size() - 1));
-		System.out.print("Frontier : ");
-		for (PolarCoordinate node : frontier) {
-			System.out.print("(" + node.getDistance() + "," + node.getAngle() + ")");
-			System.out.print(" ");
-		}
-		System.out.println();
 	}
 }

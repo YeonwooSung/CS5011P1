@@ -1,4 +1,5 @@
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.LinkedList;
 import java.util.Queue;
 
@@ -8,7 +9,10 @@ public class AStarSearch extends Search {
 		super(numOfParallels);
 	}
 
-	public void aStartSearch() {
+	/**
+	 * Run A* search.
+	 */
+	public void search() {
 		Queue<PolarCoordinate> queue = new LinkedList<PolarCoordinate>();
 		queue.add(A1main.starting);
 		PolarCoordinate finalNode = A1main.starting;
@@ -29,6 +33,7 @@ public class AStarSearch extends Search {
 			if (diff != 0) {
 				ArrayList<PolarCoordinate> list = currentNode.getHeuristicListOfNextCoordinates(numOfParallels, currentNode, diff);
 				System.out.println("Current coordinate: " + currentNode.getDistance() + ", " + currentNode.getAngle());
+				printOutCoordinatesInTheQueue(queue);
 				super.printOutListOfCoordinates(list);
 				super.insertIntoQueue(queue, list);
 			} else {
@@ -40,16 +45,46 @@ public class AStarSearch extends Search {
 			}
 		}
 
+		printOutResultPaths(finalNode);
+	}
+
+	private void printOutResultPaths(PolarCoordinate finalNode) {
 		System.out.print("Result Path: ");
 		PolarCoordinate node = finalNode;
 
+		ArrayList<String> paths = new ArrayList<String>();
+
 		while (node.getParent() != null) {
-			if (node.getParent().equals(A1main.starting)) {
-				System.out.print(node.getPath());
-			} else {
-				System.out.print(node.getPath() + ", ");
-			}
+			paths.add(node.getPath());
 			node = node.getParent();
 		}
+
+		Collections.reverse(paths);
+
+		for (String path : paths) {
+			System.out.print(path);
+			System.out.print(" ");
+		}
+		System.out.println();
+	}
+
+	/**
+	 * Print out the coordinates in the queue.
+	 * @param queue - The queue that the A* search uses.
+	 */
+	private void printOutCoordinatesInTheQueue(Queue<PolarCoordinate> queue) {
+		System.out.print("Queue : ");
+		int index = 0;
+		int lastIndex = queue.size();
+
+		for (PolarCoordinate p : queue) {
+			System.out.print("(" + p.getDistance() + ", " + p.getAngle() + ")");
+
+			if (index != lastIndex) System.out.print(", ");
+
+			index += 1;
+		}
+
+		System.out.println();
 	}
 }

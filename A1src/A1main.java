@@ -4,6 +4,7 @@ public class A1main {
 	private static final String SEARCH_BFS = "BFS";
 	private static final String SEARCH_DFS = "DFS";
 	private static final String SEARCH_ASTAR = "AStar";
+	private static final String SEARCH_BEST_FIRST = "BestF";
 
 	public static PolarCoordinate starting;
 	public static PolarCoordinate goal;
@@ -72,19 +73,25 @@ public class A1main {
                 if (args[0].equals(SEARCH_DFS)) {
                 	// run DFS
                 	DFS dfs = new DFS(numOfParallels);
-                	dfs.dfs(starting);
+                	dfs.search(starting);
                 	dfs.printOutPathsFromFrontier();
 
                 } else if (args[0].equals(SEARCH_BFS)) {
                 	// run BFS
-
                 	BFS bfs = new BFS(numOfParallels);
-                	bfs.bfs();
+                	bfs.search();
+
                 } else if (args[0].equals(SEARCH_ASTAR)) {
                 	// run A* search
-
                 	AStarSearch astar = new AStarSearch(numOfParallels);
-                	astar.aStartSearch();
+                	astar.search();
+
+                } else if (args[0].equals(SEARCH_BEST_FIRST)) {
+                	//run Best First search
+                	BestFirstSearch bestF = new BestFirstSearch(numOfParallels);
+                	bestF.search(starting);
+                	bestF.printOutPathsFromFrontier();
+
                 } else {
                 	System.out.println(args[1]);
                 	throw new Exception();
