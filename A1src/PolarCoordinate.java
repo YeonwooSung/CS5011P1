@@ -1,6 +1,5 @@
 import java.util.ArrayList;
 
-
 public class PolarCoordinate {
 	private final int ZERO = 0;
 	private final int ONE = 1;
@@ -10,21 +9,29 @@ public class PolarCoordinate {
 
 	private int angle;
 	private int distance;
-	private boolean marked;
 	private String path;
+
+	private PolarCoordinate parent;
+	private ArrayList<PolarCoordinate> list;
 
 	PolarCoordinate(int distance, int angle) {
 		this.angle = angle;
 		this.distance = distance;
-		this.marked = false;
-		this.setPath("");
+		this.path = "";
+
+		this.list = null;
+		this.parent = null;
 	}
 
 	PolarCoordinate(int distance, int angle, String path) {
-		this.angle = angle;
-		this.distance = distance;
-		this.marked = false;
-		this.setPath(path);
+		this(distance, angle);
+		this.path = path;
+		this.parent = null;
+	}
+
+	PolarCoordinate(int distance, int angle, String path, PolarCoordinate parent) {
+		this(distance, angle, path);
+		this.parent = parent;
 	}
 
 	/**
@@ -54,19 +61,19 @@ public class PolarCoordinate {
 	}
 
 	/**
+	 * Check if the search algorithm reached to the goal.
+	 * @return If it reached to the goal, returns true. Otherwise, returns false.
+	 */
+	public boolean checkIfReachedToGoal() {
+		return (getDifferencesBetween(A1main.goal) == 0);
+	}
+
+	/**
 	 * Getter for angle.
 	 * @return the angle
 	 */
 	public int getAngle() {
 		return angle;
-	}
-
-	/**
-	 * Setter for angle.
-	 * @param angle the angle to set
-	 */
-	public void setAngle(int angle) {
-		this.angle = angle;
 	}
 
 	/**
@@ -78,20 +85,16 @@ public class PolarCoordinate {
 	}
 
 	/**
-	 * Setter for distance
-	 * @param distance the distance to set
-	 */
-	public void setDistance(int distance) {
-		this.distance = distance;
-	}
-
-	/**
 	 * Returns the list of next possible nodes.
 	 * @param numOfParellels - N
 	 * @return The array list of next nodes.
 	 */
 	public ArrayList<PolarCoordinate> getListOfNextCoordinates(int numOfParallels) {
-		ArrayList<PolarCoordinate> list = new ArrayList<PolarCoordinate>();
+		if (list != null) {
+			return list;
+		}
+
+		list = new ArrayList<PolarCoordinate>();
 		if (distance != 1) {
 			// add polar coordinate node for H360(N) path
 			list.add(new PolarCoordinate(distance - ONE, angle, "H360"));
@@ -119,12 +122,80 @@ public class PolarCoordinate {
 		return list;
 	}
 
-	public void mark() {
-		this.marked = true;
+	/**
+	 * Returns the list of next possible nodes.
+	 * @param numOfParellels - N
+	 * @return The array list of next nodes.
+	 */
+	public ArrayList<PolarCoordinate> getListOfNextCoordinates(int numOfParallels, PolarCoordinate parent) {
+		if (list != null) {
+			return list;
+		}
+
+		list = new ArrayList<PolarCoordinate>();
+		if (distance != 1) {
+			// add polar coordinate node for H360(N) path
+			list.add(new PolarCoordinate(distance - ONE, angle, "H360", parent));
+		}
+
+		if (distance != numOfParallels - 1) {
+			// add polar coordinate node for H180(S) path
+			list.add(new PolarCoordinate(distance + ONE, angle, "H180", parent));
+		}
+
+		// add polar coordinate node for H90(E) path
+		if (angle != MAX_ANGLE) {
+			list.add(new PolarCoordinate(distance, angle + ANGLE_UNIT, "H90", parent));
+		} else {
+			list.add(new PolarCoordinate(distance, ZERO, "H90", parent));
+		}
+
+		// add polar coordinate node for H270(E) path
+		if (angle != ZERO) {
+			list.add(new PolarCoordinate(distance, angle - ANGLE_UNIT, "H270", parent));
+		} else {
+			list.add(new PolarCoordinate(distance, MAX_ANGLE, "H270", parent));
+		}
+
+		return list;
 	}
 
-	public boolean checkIfMarked() {
-		return marked;
+	/**
+	 * Returns the list of next possible nodes.
+	 * @param numOfParellels - N
+	 * @return The array list of next nodes - sorted by remaining distances.
+	 */
+	public ArrayList<PolarCoordinate> getSortedListOfNextCoordinates(int numOfParallels, PolarCoordinate parent) {
+		if (list != null) return list;
+
+		getListOfNextCoordinates(numOfParallels, parent);
+		list.sort((p1, p2) -> ((Integer)p1.getDifferencesBetween(A1main.goal)).compareTo(((Integer) p2.getDifferencesBetween(A1main.goal))));
+
+		return list;
+	}
+
+	/**
+	 * Get a list of next coordinates.
+	 * But this list only contains the nodes whose remaining distance is shorter than previous node.
+	 * @param numOfParallels - N
+	 * @param parent - parent node
+	 * @param previous_diff - previous node's remaining distance
+	 * @return The list of next coordinates.
+	 */
+	public ArrayList<PolarCoordinate> getHeuristicListOfNextCoordinates(int numOfParallels, PolarCoordinate parent, int previous_diff) {
+		getListOfNextCoordinates(numOfParallels, parent);
+
+		for (int i = 0; i < list.size(); i++) {
+			PolarCoordinate node = list.get(i);
+			int diff = node.getDifferencesBetween(A1main.goal);
+
+			if (diff >= previous_diff) {
+				list.remove(i);
+				i -= 1;
+			}
+		}
+
+		return list;
 	}
 
 	/**
@@ -136,10 +207,10 @@ public class PolarCoordinate {
 	}
 
 	/**
-	 * Setter for path
-	 * @param path the path to set
+	 * Getter for parent.
+	 * @return parent node
 	 */
-	public void setPath(String path) {
-		this.path = path;
+	public PolarCoordinate getParent() {
+		return parent;
 	}
 }

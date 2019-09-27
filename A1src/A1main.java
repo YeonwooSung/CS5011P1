@@ -1,11 +1,18 @@
 import java.io.IOException;
-import java.util.LinkedList;
-import java.util.Queue;
 
 public class A1main {
+	private static final String SEARCH_BFS = "BFS";
+	private static final String SEARCH_DFS = "DFS";
+	private static final String SEARCH_ASTAR = "AStar";
+
 	public static PolarCoordinate starting;
 	public static PolarCoordinate goal;
 
+	/**
+	 * Check if the value of given angle is valid.
+	 * @param angle - angle to validate
+	 * @throws IOException
+	 */
 	public static void validateAngle(int angle) throws IOException {
 		switch (angle) {
 			case 0 :
@@ -22,8 +29,14 @@ public class A1main {
 		}
 	}
 
+	/**
+	 * Check if the value of given distance is valid.
+	 * @param distance - distance to validate
+	 * @param numOfParallels - N
+	 * @throws IOException
+	 */
 	public static void validateDistance(int distance, int numOfParallels) throws IOException {
-		if (distance < 0 || distance > numOfParallels - 1) {
+		if (distance < 0 || distance >= numOfParallels) {
         	throw new IOException();
         }
 	}
@@ -41,7 +54,7 @@ public class A1main {
 
                 int d_s = Integer.parseInt(strArray_s[0]);
                 int angle_s = Integer.parseInt(strArray_s[1]);
-                
+
                 int d_g = Integer.parseInt(strArray_g[0]);
                 int angle_g = Integer.parseInt(strArray_g[1]);
 
@@ -56,21 +69,31 @@ public class A1main {
                 starting = new PolarCoordinate(d_s, angle_s);
                 goal = new PolarCoordinate(d_g, angle_g);
 
-                //TODO
-                DFS dfs = new DFS(numOfParallels);
-                Queue<PolarCoordinate> path = new LinkedList<PolarCoordinate>();
-                boolean[][] visited = new boolean[numOfParallels - 1][8];
-                dfs.dfs(starting, path, visited);
-                while (!path.isEmpty()) {
-                	PolarCoordinate p = path.poll();
-                	String pathStr = p.getPath();
-                	if (!pathStr.equals("")) {
-                		System.out.println(pathStr);
-                	}
+                if (args[0].equals(SEARCH_DFS)) {
+                	// run DFS
+                	DFS dfs = new DFS(numOfParallels);
+                	dfs.dfs(starting);
+                	dfs.printOutPathsFromFrontier();
+
+                } else if (args[0].equals(SEARCH_BFS)) {
+                	// run BFS
+
+                	BFS bfs = new BFS(numOfParallels);
+                	bfs.bfs();
+                } else if (args[0].equals(SEARCH_ASTAR)) {
+                	// run A* search
+
+                	AStarSearch astar = new AStarSearch(numOfParallels);
+                	astar.aStartSearch();
+                } else {
+                	System.out.println(args[1]);
+                	throw new Exception();
                 }
             } catch (NumberFormatException e) {
             	e.printStackTrace();
             } catch (IOException e) {
+            	e.printStackTrace();
+            } catch (Exception e) {
             	e.printStackTrace();
             }
         }

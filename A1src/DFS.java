@@ -1,99 +1,101 @@
 import java.util.ArrayList;
-import java.util.Queue;
-import java.util.LinkedList;
 
 public class DFS extends Search {
-	private final int ANGLE_UNIT = 45;
+	private ArrayList<PolarCoordinate> frontier;
 
 	DFS(int numOfParallels) {
 		super(numOfParallels);
+		frontier = new ArrayList<PolarCoordinate>();
 	}
 
 	/**
-	 * Run DFS recursively.
+	 * Run DFS.
 	 * @param starting - starting node
-	 * @param path - Queue that contains the path.
-	 * @param visited - boolean array to check the visited nodes
 	 * @return If success, returns the number of nodes that dfs passed through. Otherwise, returns -1.
 	 */
-	public int dfs(PolarCoordinate starting, Queue<PolarCoordinate> path, boolean[][] visited) {
+	public int dfs(PolarCoordinate starting) {
 		int angle = starting.getAngle();
 		int distance = starting.getDistance();
 
+		System.out.println("Current coordinate: " + starting.getDistance() + ", " + starting.getAngle());
+
 		// check if visited
-		if (super.checkIfVisited(angle, distance, visited)) {
+		if (super.checkIfVisited(angle, distance)) {
+			System.out.println("Already visited this coordinate...");
+			printOutFrontier();
+			System.out.println();
 			return -1;
 		}
 
 		// check visited nodes to prevent infinite loop
 		super.visit(starting.getAngle(), starting.getDistance());
-		int targetIndex = angle / ANGLE_UNIT;
-		visited[distance - 1][targetIndex] = true;
-
-		// get difference between current node and goal
-		int diff = starting.getDifferencesBetween(A1main.goal);
+		frontier.add(starting);
 
 		// check if current node is a goal
-		if (diff != 0) {
-			path.add(starting);
+		if (starting.checkIfReachedToGoal()) {
 
+			System.out.println("Found the goal!");
+			printOutFrontier();
+			System.out.println();
+			return 1;
+
+		} else {
 			ArrayList<PolarCoordinate> list = starting.getListOfNextCoordinates(numOfParallels);
 			int size = list.size();
+			int numOfPaths = -1;
 
-			int min = -1;
-			Queue<PolarCoordinate> minPath = null;
+			printOutFrontier(); // print out the frontier
+			super.printOutListOfCoordinates(list); // print out the expanded nodes
 
+			//use for loop to make recursive calls with all child nodes
 			for (int i = 0; i < size; i++) {
-				boolean[][] visitedArr = new boolean[numOfParallels - 1][8];
-				for (int a = 0; a < visitedArr.length; a++) {
-					visitedArr[a] = visited[a].clone();
-				}
-
-				Queue<PolarCoordinate> paths = new LinkedList<PolarCoordinate>();
-
-				int result = dfs(list.get(i), paths, visitedArr);
+				int result = dfs(list.get(i)); //call this function recursively
 
 				// check the result value to find the shortest path.
 				if (result != -1) {
-					if (min != -1) {
-						if (min > result) {
-							min = result;
-							minPath = paths;
-						}
-					} else {
-						min = result;
-						minPath = paths;
-					}
+					numOfPaths = result;
+					break;
 				}
-
-				// clean the visit history
-				super.cleanVisitedHistory(visitedArr, visited);
 			}
 
-			mergePaths(path, minPath);
-
-			if (min != -1) {
-				return min + 1;
-			} else {
-				return min;
+			if (numOfPaths == -1) {
+				frontier.remove(frontier.size() - 1); //remove current node from frontier
 			}
-		} else {
-			path.add(starting);
-			return 1;
+
+			return numOfPaths;
 		}
 	}
 
 	/**
-	 * Merge 2 queues where each queue contains the path.
-	 * @param path - The queue.
-	 * @param targetPath - The target queue that should be merged to path.
+	 * Print out paths that are stored in the frontier.
 	 */
-	public void mergePaths(Queue<PolarCoordinate> path, Queue<PolarCoordinate> targetPath) {
-		if (targetPath == null) return;
+	public void printOutPathsFromFrontier() {
+		PolarCoordinate lastNode = frontier.get(frontier.size() - 1);
+		System.out.print("Result Path : ");
 
-		while (!targetPath.isEmpty()) {
-			PolarCoordinate p = targetPath.poll();
-			path.add(p);
+		for (PolarCoordinate node : frontier) {
+			String path = node.getPath();
+
+			if (!path.equals("")) {
+				System.out.print(path);
+				
+				if (!node.equals(lastNode)) {
+					System.out.print(", ");
+				}
+			}
 		}
+	}
+
+	/**
+	 * Print out all coordinates in the frontier.
+	 */
+	private void printOutFrontier() {
+		System.out.println("Number of moves : " + (frontier.size() - 1));
+		System.out.print("Frontier : ");
+		for (PolarCoordinate node : frontier) {
+			System.out.print("(" + node.getDistance() + "," + node.getAngle() + ")");
+			System.out.print(" ");
+		}
+		System.out.println();
 	}
 }

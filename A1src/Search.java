@@ -43,13 +43,14 @@ public class Search {
 		}
 	}
 
-	public void cleanVisitedHistory(boolean[][] target, boolean[][] arr) {
-		for (int i = 0; i < target.length; i++) {
-			for (int j = 0; j < target[i].length; j++) {
-				if (target[i][j] && !arr[i][j]) {
-					visited[i][j] = false;
-				}
-			}
+	public void printOutListOfCoordinates(ArrayList<PolarCoordinate> list) {
+		System.out.println("Expanded nodes: ");
+		for (int i = 0; i < list.size(); i++) {
+			PolarCoordinate p = list.get(i);
+			int index = i + 1;
+			System.out.print("	Node" + index + " : Coordinate = " + p.getDistance() + ", " + p.getAngle());
+			System.out.println(" & Path = " + p.getPath());
 		}
+		System.out.println();
 	}
 }

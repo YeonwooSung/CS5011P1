@@ -1,17 +1,14 @@
 import java.util.ArrayList;
-import java.util.Queue;
 import java.util.LinkedList;
+import java.util.Queue;
 
-public class BFS extends Search {
+public class AStarSearch extends Search {
 
-	BFS(int numOfParallels) {
+	AStarSearch(int numOfParallels) {
 		super(numOfParallels);
 	}
 
-	/**
-	 * Run bfs.
-	 */
-	public void bfs() {
+	public void aStartSearch() {
 		Queue<PolarCoordinate> queue = new LinkedList<PolarCoordinate>();
 		queue.add(A1main.starting);
 		PolarCoordinate finalNode = A1main.starting;
@@ -26,18 +23,20 @@ public class BFS extends Search {
 
 			super.visit(currentNode.getAngle(), currentNode.getDistance());
 
-			// check if this is the node that we are looking for.
-			if (currentNode.checkIfReachedToGoal()) {
+			int diff = currentNode.getDifferencesBetween(A1main.goal);
+
+			// check if the A* search reached to the goal
+			if (diff != 0) {
+				ArrayList<PolarCoordinate> list = currentNode.getHeuristicListOfNextCoordinates(numOfParallels, currentNode, diff);
+				System.out.println("Current coordinate: " + currentNode.getDistance() + ", " + currentNode.getAngle());
+				super.printOutListOfCoordinates(list);
+				super.insertIntoQueue(queue, list);
+			} else {
 				System.out.println("Current coordinate: " + currentNode.getDistance() + ", " + currentNode.getAngle());
 				System.out.println("Found the goal!");
 				System.out.println();
 				finalNode = currentNode;
 				break;
-			} else {
-				ArrayList<PolarCoordinate> list = currentNode.getListOfNextCoordinates(numOfParallels, currentNode);
-				System.out.println("Current coordinate: " + currentNode.getDistance() + ", " + currentNode.getAngle());
-				super.printOutListOfCoordinates(list);
-				super.insertIntoQueue(queue, list);
 			}
 		}
 
