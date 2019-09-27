@@ -84,6 +84,8 @@ public class DFS extends Search {
 				}
 			}
 		}
+
+		System.out.println();
 	}
 
 	/**

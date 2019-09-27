@@ -93,5 +93,7 @@ public class BestFirstSearch extends Search {
 				}
 			}
 		}
+
+		System.out.println();
 	}
 }
