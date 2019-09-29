@@ -17,6 +17,8 @@ public class BFS extends Search {
 		queue.add(A1main.starting);
 		PolarCoordinate finalNode = A1main.starting;
 
+		int moves = -1;
+
 		// iterate the queue
 		while (!queue.isEmpty()) {
 			PolarCoordinate currentNode = queue.poll();
@@ -25,6 +27,7 @@ public class BFS extends Search {
 				continue;
 			}
 
+			moves += 1;
 			super.visit(currentNode.getAngle(), currentNode.getDistance());
 
 			// check if this is the node that we are looking for.
@@ -35,7 +38,7 @@ public class BFS extends Search {
 				finalNode = currentNode;
 				break;
 			} else {
-				ArrayList<PolarCoordinate> list = currentNode.getListOfNextCoordinates(numOfParallels, currentNode);
+				ArrayList<PolarCoordinate> list = currentNode.getListOfNextCoordinates(numOfParallels);
 				System.out.println("Current coordinate: " + currentNode.getDistance() + ", " + currentNode.getAngle());
 				printOutCoordinatesInTheQueue(queue);
 				super.printOutListOfCoordinates(list);
@@ -44,6 +47,7 @@ public class BFS extends Search {
 		}
 
 		this.printOutResultPaths(finalNode);
+		System.out.println("The number of total moves = " + moves);
 	}
 
 	/**

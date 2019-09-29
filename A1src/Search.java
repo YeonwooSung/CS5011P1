@@ -32,7 +32,7 @@ public class Search {
 
 	public boolean checkIfVisited(int angle, int distance, boolean[][] visited) {
 		int target = angle / ANGLE_UNIT;
-		return visited[distance - 1] [target];
+		return visited[distance - 1][target];
 	}
 
 	public void insertIntoQueue(Queue<PolarCoordinate> queue, ArrayList<PolarCoordinate> list) {

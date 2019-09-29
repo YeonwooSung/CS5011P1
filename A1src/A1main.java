@@ -5,6 +5,7 @@ public class A1main {
 	private static final String SEARCH_DFS = "DFS";
 	private static final String SEARCH_ASTAR = "AStar";
 	private static final String SEARCH_BEST_FIRST = "BestF";
+	private static final String SEARCH_BIDIRECTIONAL = "BiDir";
 
 	public static PolarCoordinate starting;
 	public static PolarCoordinate goal;
@@ -92,6 +93,12 @@ public class A1main {
                 	bestF.search(starting);
                 	bestF.printOutPathsFromFrontier();
 
+                } else if (args[0].equals(SEARCH_BIDIRECTIONAL)) {
+                	//run bi-directional search
+                	BidirectionalSearch bidir = new BidirectionalSearch(numOfParallels);
+                	bidir.search();
+
+                	//TODO
                 } else {
                 	System.out.println(args[1]);
                 	throw new Exception();

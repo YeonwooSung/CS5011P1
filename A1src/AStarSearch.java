@@ -31,7 +31,7 @@ public class AStarSearch extends Search {
 
 			// check if the A* search reached to the goal
 			if (diff != 0) {
-				ArrayList<PolarCoordinate> list = currentNode.getHeuristicListOfNextCoordinates(numOfParallels, currentNode, diff);
+				ArrayList<PolarCoordinate> list = currentNode.getHeuristicListOfNextCoordinates(numOfParallels, diff);
 				System.out.println("Current coordinate: " + currentNode.getDistance() + ", " + currentNode.getAngle());
 				printOutCoordinatesInTheQueue(queue);
 				super.printOutListOfCoordinates(list);
