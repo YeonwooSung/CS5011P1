@@ -17,6 +17,8 @@ public class AStarSearch extends Search {
 		queue.add(A1main.starting);
 		PolarCoordinate finalNode = A1main.starting;
 
+		boolean checker = false;
+
 		// iterate the queue
 		while (!queue.isEmpty()) {
 			PolarCoordinate currentNode = queue.poll();
@@ -41,11 +43,17 @@ public class AStarSearch extends Search {
 				System.out.println("Found the goal!");
 				System.out.println();
 				finalNode = currentNode;
+				checker = true;
 				break;
 			}
 		}
 
-		printOutResultPaths(finalNode);
+		if (checker) {
+			this.printOutResultPaths(finalNode);
+		} else {
+			System.out.println("A* Search failed to reach the goal");
+			System.out.println("Please check if the coordinate of the goal is valid");
+		}
 	}
 
 	private void printOutResultPaths(PolarCoordinate finalNode) {

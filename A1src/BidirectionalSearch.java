@@ -1,4 +1,5 @@
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.LinkedList;
 import java.util.Queue;
 
@@ -22,48 +23,51 @@ public class BidirectionalSearch extends Search {
 		Queue<PolarCoordinate> reverseQueue = new LinkedList<PolarCoordinate>();
 		reverseQueue.add(A1main.goal);
 
-		boolean checker1 = false;
-		boolean checker2 = false;
+		int finished = 0;
 
-		while (true) {
-			if (queue.isEmpty()) {
-				checker1 = true;
-				break;
-			} else {
-				if (checkAndExpandNodes(queue, 1, 2)) {
+		try {
+			// iterate while loop until either queue1 or queue2 are empty.
+			while (!queue.isEmpty() || !reverseQueue.isEmpty()) {
+				if (checkAndExpandNodes(queue, visited1, visited2, list1)) {
+					finished = 1;
+					break;
+				}
+
+				if (checkAndExpandNodes(reverseQueue, visited2, visited1, list2)) {
+					finished = 2;
 					break;
 				}
 			}
+		} catch (ArrayIndexOutOfBoundsException e) {
+			System.out.println("Please check the command line arguments");
+			System.out.println("Aircraft cannot reach or fly over the pole!");
+			return;
+		}
 
-			if (reverseQueue.isEmpty()) {
-				checker2 = true;
+		PolarCoordinate path1 = null;
+		PolarCoordinate path2 = null;
+
+		switch (finished) {
+			case 1:
+				path1 = list1.get(list1.size() - 1);
+				path2 = findNodeFromList(path1, list2);
 				break;
-			} else {
-				if (checkAndExpandNodes(reverseQueue, 2, 1)) {
-					break;
-				}
-			}
+			case 2:
+				path2 = list2.get(list2.size() - 1);
+				path1 = findNodeFromList(path2, list1);
 		}
 
-		if (checker1) {
-			System.out.println("TEST1");
-			//TODO queue is the path
-		} else if (checker2) {
-			System.out.println("TEST2");
-			//TODO reverseQueue is the path
-		} else {
-			//TODO merge 1 & 2
-		}
+		//TODO description
+		reversePath(path2);
 
-		//TODO
-		for (PolarCoordinate node : list1) {
-			System.out.println(node.getAngle() + ", " + node.getDistance());
+		ArrayList<PolarCoordinate> pahts = mergePath(path1, path2);
+
+		System.out.print("Result path: ");
+		for (PolarCoordinate node : pahts) {
+			System.out.print(node.getPath());
+			System.out.print(" ");
 		}
 		System.out.println();
-
-		for (PolarCoordinate node : list2) {
-			System.out.println(node.getAngle() + ", " + node.getDistance());
-		}
 	}
 
 	private void appendExpandedNodesToQueue(Queue<PolarCoordinate> queue, PolarCoordinate node) {
@@ -71,25 +75,52 @@ public class BidirectionalSearch extends Search {
 		super.insertIntoQueue(queue, list);
 	}
 
-	public boolean checkAndExpandNodes(Queue<PolarCoordinate> queue, int n, int m) {
+	private void reversePath(PolarCoordinate coordinate) {
+		PolarCoordinate node = coordinate;
+		while (node.getParent() != null) {
+			String path = node.getPath();
+			String newPath;
+
+			if (path.equals("H360")) {
+				newPath = new String("H180");
+			} else if (path.equals("H180")) {
+				newPath = new String("H360");
+			} else if (path.equals("H90")) {
+				newPath = new String("H270");
+			} else {
+				newPath = new String("H90");
+			}
+
+			node.setPath(newPath);
+			node = node.getParent();
+		}
+	}
+
+	/**
+	 * Check if the current node is marked as visited.
+	 * If not, expand the nodes, and add the expanded nodes to the queue.
+	 * @param queue - Queue that contains the nodes.
+	 * @param visited - boolean array to check if the current node is marked as visited.
+	 * @param otherArr - another boolean array that contains the visiting history of the other queue.
+	 * @param list - ArrayList that contains the all visited nodes.
+	 * @return If the Bidirectional search find the path, returns true. Otherwise, returns false.
+	 * @throws ArrayIndexOutOfBoundsException
+	 */
+	public boolean checkAndExpandNodes(Queue<PolarCoordinate> queue, boolean[][] visited, boolean[][] otherArr, ArrayList<PolarCoordinate> list) throws ArrayIndexOutOfBoundsException {
 		PolarCoordinate node = queue.poll();
 		int angle = node.getAngle();
 		int distance = node.getDistance();
 
-		if (checkIfVisited(angle, distance, n)) {
+		// check if the current node is visited
+		if (checkIfVisited(angle, distance, visited)) {
 			return false;
 		}
 
-		visit(angle, distance, n);
+		visit(angle, distance, visited);
+		list.add(node);
 
-		//TODO
-		if (n == 1) {
-			list1.add(node);
-		} else {
-			list2.add(node);
-		}
-
-		if (checkIfVisited(angle, distance, m)) {
+		// check if the current node is visited by other queue.
+		if (checkIfVisited(angle, distance, otherArr)) {
 			return true;
 		} else {
 			appendExpandedNodesToQueue(queue, node);
@@ -98,26 +129,59 @@ public class BidirectionalSearch extends Search {
 		return false;
 	}
 
-	private void visit(int angle, int distance, int n) {
-		int target = angle / ANGLE_UNIT;
+	/**
+	 * Find the specific node from the given array list of PolarCoordinate objects.
+	 * @param target - target node.
+	 * @param list - Array list of PolarCoordinate objects.
+	 * @return Found object.
+	 */
+	private PolarCoordinate findNodeFromList(PolarCoordinate target, ArrayList<PolarCoordinate> list) {
+		int angle = target.getAngle();
+		int distance = target.getDistance();
+		PolarCoordinate found = null;
 
-		switch (n) {
-			case 1:
-				visited1[distance - 1][target] = true;
-				break;
-			case 2:
-				visited2[distance - 1][target] = true;
-				break;
+		// use for loop to iterate ArrayList
+		for (PolarCoordinate node : list) {
+			if (node.getAngle() == angle && node.getDistance() == distance) {
+				found = node;
+			}
 		}
+
+		return found;
 	}
 
-	private boolean checkIfVisited(int angle, int distance, int n) {
-		int target = angle / ANGLE_UNIT;
+	/**
+	 * Merge the path so that the program could print out the found path.
+	 * @param node1 - last node of the first linked list.
+	 * @param node2 - last node of the second linked list.
+	 * @return ArrayList that contains the paths.
+	 */
+	private ArrayList<PolarCoordinate> mergePath(PolarCoordinate node1, PolarCoordinate node2) {
+		ArrayList<PolarCoordinate> paths = new ArrayList<PolarCoordinate>();
 
-		if (n != 2) {
-			return visited1[distance - 1] [target];
+		while (node1.getParent() != null) {
+			paths.add(node1);
+			node1 = node1.getParent();
 		}
 
-		return visited2[distance - 1] [target];
+		Collections.reverse(paths);
+
+		while (node2 != null) {
+			paths.add(node2);
+			node2 = node2.getParent();
+		}
+
+		return paths;
+	}
+
+	/**
+	 * Mark the given coordinate as visited.
+	 * @param angle - angle of the target node.
+	 * @param distance - distance of the target node.
+	 * @param visited - boolean array to store visit history.
+	 */
+	private void visit(int angle, int distance, boolean[][] visited) {
+		int target = angle / ANGLE_UNIT;
+		visited[distance - 1][target] = true;
 	}
 }

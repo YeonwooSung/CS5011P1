@@ -18,6 +18,7 @@ public class BFS extends Search {
 		PolarCoordinate finalNode = A1main.starting;
 
 		int moves = -1;
+		boolean checker = false;
 
 		// iterate the queue
 		while (!queue.isEmpty()) {
@@ -36,6 +37,7 @@ public class BFS extends Search {
 				System.out.println("Found the goal!");
 				System.out.println();
 				finalNode = currentNode;
+				checker = true;
 				break;
 			} else {
 				ArrayList<PolarCoordinate> list = currentNode.getListOfNextCoordinates(numOfParallels);
@@ -46,8 +48,13 @@ public class BFS extends Search {
 			}
 		}
 
-		this.printOutResultPaths(finalNode);
-		System.out.println("The number of total moves = " + moves);
+		if (checker) {
+			this.printOutResultPaths(finalNode);
+			System.out.println("The number of total moves = " + moves);
+		} else {
+			System.out.println("BFS failed to reach the goal");
+			System.out.println("Please check if the coordinate of the goal is valid");
+		}
 	}
 
 	/**

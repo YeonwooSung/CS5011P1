@@ -169,6 +169,14 @@ public class PolarCoordinate {
 	}
 
 	/**
+	 * Setter for path.
+	 * @param path - new path.
+	 */
+	public void setPath(String path) {
+		this.path = path;
+	}
+
+	/**
 	 * Getter for parent.
 	 * @return parent node
 	 */
