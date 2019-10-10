@@ -44,6 +44,14 @@ public class A1main {
         }
 	}
 
+	/**
+	 * Generate the array list that contains the coordinates that the aircraft cannot fly over due to the weather issue.
+	 * @param args - command line arguments
+	 * @param numOfParallels - N
+	 * @return The array list of forecast coordinates.
+	 * @throws NumberFormatException
+	 * @throws IOException
+	 */
 	private static ArrayList<PolarCoordinate> generateForecastList(String[] args, int numOfParallels) throws NumberFormatException, IOException {
 		ArrayList<PolarCoordinate> forecast = new ArrayList<PolarCoordinate>();
 
@@ -74,11 +82,6 @@ public class A1main {
 
                 int d_s = Integer.parseInt(strArray_s[0]);
                 int angle_s = Integer.parseInt(strArray_s[1]);
-
-                if (d_s == 0) {
-                	System.out.println("The aircraft cannot reach or fly over the pole, such as (0,0)");
-                	return;
-                }
 
                 int d_g = Integer.parseInt(strArray_g[0]);
                 int angle_g = Integer.parseInt(strArray_g[1]);
@@ -141,8 +144,12 @@ public class A1main {
                 }
             } catch (NumberFormatException e) {
             	e.printStackTrace();
+            	System.out.println("Invalid coordinate!");
+            	System.out.println("Please check the command line arguments");
             } catch (IOException e) {
             	e.printStackTrace();
+            	System.out.println("Invalid coordinate!");
+            	System.out.println("Please check the command line arguments");
             } catch (Exception e) {
             	e.printStackTrace();
             }

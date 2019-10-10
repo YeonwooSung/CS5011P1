@@ -36,15 +36,17 @@ public class PolarCoordinate {
 
 	/**
 	 * Get the differences between this coordinate and given coordinate.
+	 * This method uses the "Euclidian distance" to get the remaining distance.
 	 * @param other - target coordinate
 	 * @return The differences between this coordinate and given coordinate.
 	 */
-	public int getDifferencesBetween(PolarCoordinate other) {
+	public double getDifferencesBetween(PolarCoordinate other) {
 		int otherAngle = other.getAngle();
 		int otherDistance = other.getDistance();
 
+		int squared_distance_total = (otherDistance * otherDistance + distance * distance);
+
 		int angle_diff = angle - otherAngle;
-		int distance_diff = distance - otherDistance;
 
 		if (angle_diff < ZERO) {
 			angle_diff = Math.abs(angle_diff);
@@ -52,11 +54,9 @@ public class PolarCoordinate {
 			angle_diff = Math.abs(otherAngle - angle);
 		}
 
-		if (distance_diff < ZERO) {
-			distance_diff = Math.abs(distance_diff);
-		}
+		double cos_angle = 2 * Math.cos(angle_diff) * distance * otherDistance;
 
-		int diffs = (angle_diff / ANGLE_UNIT) + distance_diff;
+		double diffs = Math.sqrt(squared_distance_total - cos_angle);
 		return diffs;
 	}
 
@@ -132,7 +132,7 @@ public class PolarCoordinate {
 		if (list != null) return list;
 
 		getListOfNextCoordinates(numOfParallels);
-		list.sort((p1, p2) -> ((Integer)p1.getDifferencesBetween(A1main.goal)).compareTo(((Integer) p2.getDifferencesBetween(A1main.goal))));
+		list.sort((p1, p2) -> ((Double)p1.getDifferencesBetween(A1main.goal)).compareTo(((Double) p2.getDifferencesBetween(A1main.goal))));
 
 		return list;
 	}
@@ -144,12 +144,12 @@ public class PolarCoordinate {
 	 * @param previous_diff - previous node's remaining distance
 	 * @return The list of next coordinates.
 	 */
-	public ArrayList<PolarCoordinate> getHeuristicListOfNextCoordinates(int numOfParallels, int previous_diff) {
+	public ArrayList<PolarCoordinate> getHeuristicListOfNextCoordinates(int numOfParallels, double previous_diff) {
 		getListOfNextCoordinates(numOfParallels);
 
 		for (int i = 0; i < list.size(); i++) {
 			PolarCoordinate node = list.get(i);
-			int diff = node.getDifferencesBetween(A1main.goal);
+			double diff = node.getDifferencesBetween(A1main.goal);
 
 			if (diff >= previous_diff) {
 				list.remove(i);

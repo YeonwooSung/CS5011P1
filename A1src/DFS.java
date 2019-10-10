@@ -27,6 +27,11 @@ public class DFS extends Search {
 		int angle = starting.getAngle();
 		int distance = starting.getDistance();
 
+		if (distance == 0) {
+			System.out.println("The aircraft cannot reach or fly over the pole, such as (0,0)");
+			return -1;
+		}
+
 		System.out.println("Current coordinate: " + starting.getDistance() + ", " + starting.getAngle());
 
 		// check if visited
@@ -117,6 +122,11 @@ public class DFS extends Search {
 	 * Print out paths that are stored in the frontier.
 	 */
 	public void printOutPathsFromFrontier() {
+		if (frontier.size() == 0) {
+			System.out.println("DFS failed to find the path!");
+			return;
+		}
+
 		PolarCoordinate lastNode = frontier.get(frontier.size() - 1);
 		System.out.print("Result Path : ");
 		int total = 0;

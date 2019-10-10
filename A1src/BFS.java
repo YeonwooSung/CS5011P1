@@ -24,6 +24,11 @@ public class BFS extends Search {
 		while (!queue.isEmpty()) {
 			PolarCoordinate currentNode = queue.poll();
 
+			if (currentNode.getDistance() == 0) {
+				System.out.println("The aircraft cannot reach or fly over the pole, such as (0,0)");
+				continue;
+			}
+
 			if (super.checkIfVisited(currentNode.getAngle(), currentNode.getDistance())) {
 				continue;
 			}
@@ -88,7 +93,7 @@ public class BFS extends Search {
 	private void printOutCoordinatesInTheQueue(Queue<PolarCoordinate> queue) {
 		System.out.print("Queue : ");
 		int index = 0;
-		int lastIndex = queue.size();
+		int lastIndex = queue.size() - 1;
 
 		for (PolarCoordinate p : queue) {
 			System.out.print("(" + p.getDistance() + ", " + p.getAngle() + ")");

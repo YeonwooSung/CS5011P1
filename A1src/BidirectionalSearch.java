@@ -10,6 +10,8 @@ public class BidirectionalSearch extends Search {
 	private boolean[][] visited2;
 	private ArrayList<PolarCoordinate> list1 = new ArrayList<>();
 	private ArrayList<PolarCoordinate> list2 = new ArrayList<>();
+	private Queue<PolarCoordinate> queue;
+	private Queue<PolarCoordinate> reverseQueue;
 
 	BidirectionalSearch(int numOfParallels) {
 		super(numOfParallels);
@@ -18,29 +20,44 @@ public class BidirectionalSearch extends Search {
 	}
 
 	public void search() {
-		Queue<PolarCoordinate> queue = new LinkedList<PolarCoordinate>();
+		queue = new LinkedList<PolarCoordinate>();
 		queue.add(A1main.starting);
-		Queue<PolarCoordinate> reverseQueue = new LinkedList<PolarCoordinate>();
+
+		reverseQueue = new LinkedList<PolarCoordinate>();
 		reverseQueue.add(A1main.goal);
 
+		// check if the aircraft could fly over or reach the starting point
+		if (A1main.starting.getDistance() == 0) {
+			System.out.println("The aircraft cannot reach or fly over the pole, such as (0,0)");
+			System.exit(0);
+		}
+
 		int finished = 0;
+		int numOfMoves1 = 0;
+		int numOfMoves2 = 0;
 
 		try {
 			// iterate while loop until either queue1 or queue2 are empty.
 			while (!queue.isEmpty() || !reverseQueue.isEmpty()) {
-				if (checkAndExpandNodes(queue, visited1, visited2, list1)) {
+				numOfMoves1 += 1;
+
+				// check the node and expand the children nodes if required.
+				if (checkAndExpandNodes(1)) {
 					finished = 1;
 					break;
 				}
 
-				if (checkAndExpandNodes(reverseQueue, visited2, visited1, list2)) {
+				numOfMoves2 += 1;
+
+				// check the node and expand the children nodes if required.
+				if (checkAndExpandNodes(2)) {
 					finished = 2;
 					break;
 				}
 			}
 		} catch (ArrayIndexOutOfBoundsException e) {
 			System.out.println("Please check the command line arguments");
-			System.out.println("Aircraft cannot reach or fly over the pole!");
+			System.out.println("Aircraft cannot reach or fly over the pole such as (0,0)!");
 			return;
 		}
 
@@ -57,26 +74,36 @@ public class BidirectionalSearch extends Search {
 				path1 = findNodeFromList(path2, list1);
 		}
 
-		//TODO description
+		/*
+		 * The queue2 starts from the goal, thus, we need to reverse the paths of the queue2.
+		 * For example, if the path from the goal to starting point is H180 H180, then the
+		 * path from the starting point to the goal will be H360 H360.
+		 *
+		 * To print out the correct result path, we need to reverse the paths of the nodes in queue2.
+		 */
 		reversePath(path2);
 
 		ArrayList<PolarCoordinate> pahts = mergePath(path1, path2);
 
-		System.out.print("Result path: ");
+		// print out the result path
+		System.out.print("\nResult path: ");
 		for (PolarCoordinate node : pahts) {
 			System.out.print(node.getPath());
 			System.out.print(" ");
 		}
-		System.out.println();
+		System.out.println("\nThe total number of moves = " + (numOfMoves1 + numOfMoves2));
 	}
 
 	private void appendExpandedNodesToQueue(Queue<PolarCoordinate> queue, PolarCoordinate node) {
 		ArrayList<PolarCoordinate> list = node.getListOfNextCoordinates(numOfParallels);
+		super.printOutListOfCoordinates(list);
 		super.insertIntoQueue(queue, list);
 	}
 
 	private void reversePath(PolarCoordinate coordinate) {
 		PolarCoordinate node = coordinate;
+
+		// use while loop to iterate the linked list
 		while (node.getParent() != null) {
 			String path = node.getPath();
 			String newPath;
@@ -99,14 +126,31 @@ public class BidirectionalSearch extends Search {
 	/**
 	 * Check if the current node is marked as visited.
 	 * If not, expand the nodes, and add the expanded nodes to the queue.
-	 * @param queue - Queue that contains the nodes.
-	 * @param visited - boolean array to check if the current node is marked as visited.
-	 * @param otherArr - another boolean array that contains the visiting history of the other queue.
-	 * @param list - ArrayList that contains the all visited nodes.
+	 * @param num - 1 for queue1, and 2 for queue2
 	 * @return If the Bidirectional search find the path, returns true. Otherwise, returns false.
 	 * @throws ArrayIndexOutOfBoundsException
 	 */
-	public boolean checkAndExpandNodes(Queue<PolarCoordinate> queue, boolean[][] visited, boolean[][] otherArr, ArrayList<PolarCoordinate> list) throws ArrayIndexOutOfBoundsException {
+	public boolean checkAndExpandNodes(int num) throws ArrayIndexOutOfBoundsException {
+		//Queue<PolarCoordinate> queue, boolean[][] visited, boolean[][] otherArr, ArrayList<PolarCoordinate> list
+		Queue<PolarCoordinate> queue;
+		boolean[][] visited;
+		boolean[][] otherArr;
+		ArrayList<PolarCoordinate> list;
+
+		switch (num) {
+			case 1:
+				queue = this.queue;
+				visited = this.visited1;
+				otherArr = this.visited2;
+				list = this.list1;
+				break;
+			default:
+				queue = this.reverseQueue;
+				visited = this.visited2;
+				otherArr = this.visited1;
+				list = this.list2;
+		}
+
 		PolarCoordinate node = queue.poll();
 		int angle = node.getAngle();
 		int distance = node.getDistance();
@@ -115,6 +159,16 @@ public class BidirectionalSearch extends Search {
 		if (checkIfVisited(angle, distance, visited)) {
 			return false;
 		}
+
+		System.out.println("Current coordinate = " + distance + ", " + angle);
+
+		if (num != 1) {
+			System.out.print("Queue2 : ");
+		} else {
+			System.out.print("Queue1 : ");
+		}
+
+		printOutCoordinatesInTheQueue(queue);
 
 		visit(angle, distance, visited);
 		list.add(node);
@@ -172,6 +226,25 @@ public class BidirectionalSearch extends Search {
 		}
 
 		return paths;
+	}
+
+	/**
+	 * Print out the coordinates in the queue.
+	 * @param queue - The queue that the BFS uses.
+	 */
+	private void printOutCoordinatesInTheQueue(Queue<PolarCoordinate> queue) {
+		int index = 0;
+		int lastIndex = queue.size() - 1;
+
+		for (PolarCoordinate p : queue) {
+			System.out.print("(" + p.getDistance() + ", " + p.getAngle() + ")");
+
+			if (index != lastIndex) System.out.print(", ");
+
+			index += 1;
+		}
+
+		System.out.println();
 	}
 
 	/**
