@@ -19,6 +19,23 @@ public class DFS extends Search {
 	}
 
 	/**
+	 * Check if the given coordinate is a weather obstacle.
+	 * @param coordinate - polar coordinate
+	 * @return
+	 */
+	private boolean checkIfStartingPointIsObstacle(PolarCoordinate coordinate) {
+		if (this.isForecastMode) {
+			for (PolarCoordinate p : this.forecast) {
+				if (p.getDifferencesBetween(coordinate) == 0) {
+					return true;
+				}
+			}
+		}
+
+		return false;
+	}
+
+	/**
 	 * Run DFS.
 	 * @param starting - starting node
 	 * @return If success, returns the number of nodes that dfs passed through. Otherwise, returns -1.
@@ -33,6 +50,12 @@ public class DFS extends Search {
 		}
 
 		System.out.println("Current coordinate: " + starting.getDistance() + ", " + starting.getAngle());
+
+		if (checkIfStartingPointIsObstacle(starting)) {
+			System.out.println("Aircraft cannot fly over this coordinate due to the weather issue!");
+			System.out.println();
+			return -1;
+		}
 
 		// check if visited
 		if (super.checkIfVisited(angle, distance)) {
