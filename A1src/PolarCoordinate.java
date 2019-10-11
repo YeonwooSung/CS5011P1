@@ -1,5 +1,9 @@
 import java.util.ArrayList;
 
+/**
+ * Class that stores each coordinate.
+ * @author 160021429
+ */
 public class PolarCoordinate {
 	private final int ZERO = 0;
 	private final int ONE = 1;

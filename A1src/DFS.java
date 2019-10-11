@@ -1,5 +1,9 @@
 import java.util.ArrayList;
 
+/**
+ * Implementation of DFS.
+ * @author 160021429
+ */
 public class DFS extends Search {
 	private ArrayList<PolarCoordinate> frontier;
 	private ArrayList<PolarCoordinate> forecast;

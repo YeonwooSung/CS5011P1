@@ -3,6 +3,10 @@ import java.util.Collections;
 import java.util.LinkedList;
 import java.util.Queue;
 
+/**
+ * Implementation of Bidirectional Search
+ * @author 160021429
+ */
 public class BidirectionalSearch extends Search {
 	private final int ANGLE_UNIT = 45;
 
@@ -19,6 +23,9 @@ public class BidirectionalSearch extends Search {
 		visited2 = new boolean[numOfParallels - 1][8];
 	}
 
+	/**
+	 * Run bidirectional search.
+	 */
 	public void search() {
 		queue = new LinkedList<PolarCoordinate>();
 		queue.add(A1main.starting);
@@ -94,12 +101,26 @@ public class BidirectionalSearch extends Search {
 		System.out.println("\nThe total number of moves = " + (numOfMoves1 + numOfMoves2));
 	}
 
+	/**
+	 * Expand the child nodes, and append those nodes to the given queue.
+	 * @param queue - queue to store expanded nodes
+	 * @param node - current node
+	 */
 	private void appendExpandedNodesToQueue(Queue<PolarCoordinate> queue, PolarCoordinate node) {
 		ArrayList<PolarCoordinate> list = node.getListOfNextCoordinates(numOfParallels);
 		super.printOutListOfCoordinates(list);
 		super.insertIntoQueue(queue, list);
 	}
 
+	/**
+	 * The queue2 starts from the goal, thus, we need to reverse the paths of the queue2.
+	 * For example, if the path from the goal to starting point is H180 H180, then the
+	 * path from the starting point to the goal will be H360 H360.
+	 *
+	 * To print out the correct result path, we need to reverse the paths of the nodes in queue2.
+	 *
+	 * @param coordinate
+	 */
 	private void reversePath(PolarCoordinate coordinate) {
 		PolarCoordinate node = coordinate;
 

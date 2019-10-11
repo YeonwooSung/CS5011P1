@@ -3,6 +3,10 @@ import java.util.Collections;
 import java.util.LinkedList;
 import java.util.Queue;
 
+/**
+ * Implementation of A* Search.
+ * @author 160021429
+ */
 public class AStarSearch extends Search {
 
 	AStarSearch(int numOfParallels) {
@@ -61,12 +65,17 @@ public class AStarSearch extends Search {
 		}
 	}
 
+	/**
+	 * Prints out the result path that the A* Search found.
+	 * @param finalNode - the final node.
+	 */
 	private void printOutResultPaths(PolarCoordinate finalNode) {
 		System.out.print("Result Path: ");
 		PolarCoordinate node = finalNode;
 
 		ArrayList<String> paths = new ArrayList<String>();
 
+		// use while loop to iterate the linked list of PolarCoodrinate objects.
 		while (node.getParent() != null) {
 			paths.add(node.getPath());
 			node = node.getParent();

@@ -1,6 +1,9 @@
 import java.util.ArrayList;
 
-
+/**
+ * Implementation of Best First Search.
+ * @author 160021429
+ */
 public class BestFirstSearch extends Search {
 	private ArrayList<PolarCoordinate> frontier;
 
@@ -9,6 +12,11 @@ public class BestFirstSearch extends Search {
 		frontier = new ArrayList<PolarCoordinate>();
 	}
 
+	/**
+	 * Performs the Best First Search.
+	 * @param starting - the current node.
+	 * @return If error occurs, returns -1. Otherwise, some positive integer will be returned.
+	 */
 	public int search(PolarCoordinate starting) {
 		int angle = starting.getAngle();
 		int distance = starting.getDistance();

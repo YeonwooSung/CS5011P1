@@ -3,6 +3,10 @@ import java.util.Collections;
 import java.util.Queue;
 import java.util.LinkedList;
 
+/**
+ * Implementation of BFS.
+ * @author 160021429
+ */
 public class BFS extends Search {
 
 	BFS(int numOfParallels) {

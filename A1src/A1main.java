@@ -1,6 +1,10 @@
 import java.io.IOException;
 import java.util.ArrayList;
 
+/**
+ * Class that contains the main method.
+ * @author 160021429
+ */
 public class A1main {
 	private static final String SEARCH_BFS = "BFS";
 	private static final String SEARCH_DFS = "DFS";
